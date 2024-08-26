@@ -1,12 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
 import Image from "next/image";
+import { FaCheckCircle } from "react-icons/fa";
 
 const CheckoutPage = () => {
   const { cartItems, clearCart, getTotalPrice } = useCart();
   const router = useRouter();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -27,12 +29,30 @@ const CheckoutPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here, you can integrate with a payment gateway (like Stripe, PayPal, etc.)
-    // For now, we'll just clear the cart and simulate a successful checkout.
     clearCart();
-    alert("Thank you for your purchase!");
-    router.push("/");
+    setIsSubmitted(true); 
   };
+
+  useEffect(() => {
+    if (isSubmitted) {
+      const timer = setTimeout(() => {
+        router.push("/");
+      }, 5000); 
+
+      return () => clearTimeout(timer);
+    }
+  }, [isSubmitted, router]);
+
+  if (isSubmitted) {
+    return (
+      <div className="bg-[#FAFAFA] flex flex-col items-center justify-center p-6 md:px-24 md:py-12 w-full h-auto">
+        <FaCheckCircle size={64} className="text-green-500 mb-4" />
+        <h1 className="font-montserrat text-2xl font-semibold leading-[33.6px] text-center text-[#121517] mb-4">
+          Thank you for shopping from Bandage, Enjoy our product!
+        </h1>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#FAFAFA] flex flex-col p-6 md:px-24 md:py-12 w-full h-auto">
@@ -41,7 +61,6 @@ const CheckoutPage = () => {
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-8 w-full">
-        {/* Billing Details */}
         <div className="flex flex-col bg-white rounded-lg p-8 gap-8 w-full lg:w-3/5">
           <h2 className="font-montserrat text-xl font-bold text-left text-[#121517]">
             Billing Details
@@ -114,7 +133,6 @@ const CheckoutPage = () => {
           </form>
         </div>
 
-        {/* Order Summary */}
         <div className="flex flex-col bg-white rounded-lg p-8 gap-8 w-full lg:w-2/5">
           <h2 className="font-montserrat text-xl font-bold text-left text-[#121517]">
             Order Summary
@@ -211,3 +229,4 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
+
